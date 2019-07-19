@@ -249,11 +249,7 @@ class NemoTerminal(object):
             cdcmd = " %s \n" % cdcmd_nonewline
             #self.feed_child(cdcmd.encode().decode("unicode_escape"))
             self.feed_child(cdcmd)
-
-            # Restore user input
-            restorelinekeys = settings.get_string("terminal-restore-line")
-            self.feed_child(restorelinekeys.encode().decode("unicode_escape") + "\n")
-            #self.feed_child(restorelinekeys + "\n")
+            self.feed_child("clear \n") #clears a printout of the cd command
 
     def get_widget(self):
         """Return the top-level widget of Nemo Terminal."""
@@ -408,14 +404,11 @@ class NemoTerminal(object):
         gobject-introspection/python-gi differences force us to try with and
         without the text length. One of them will work.
         """
-        # print(type(text), "feed '%s'" % text)
+        item = text.encode("utf8")
         try:
-            self.term.feed_child(text.encode())
+            self.term.feed_child(item.decode())
         except TypeError:
-            try:
-                self.term.feed_child(text, len(text))
-            except TypeError:
-                self.term.feed_child(text.encode(), len(text))
+            self.term.feed_child(item.decode(), len(item))
 
 class Crowbar(object):
     """Modify the Nemo' widget tree when the crowbar is inserted in it.
