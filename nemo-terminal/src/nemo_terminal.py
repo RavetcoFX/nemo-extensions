@@ -251,6 +251,10 @@ class NemoTerminal(object):
             self.feed_child(cdcmd)
             self.feed_child("clear \n") #clears a printout of the cd command
 
+             # Restore user input
+            restorelinekeys = settings.get_string("terminal-restore-line")
+            self.feed_child(restorelinekeys.encode().decode("unicode_escape"))
+
     def get_widget(self):
         """Return the top-level widget of Nemo Terminal."""
         #if not self.term.get_parent():
@@ -402,13 +406,19 @@ class NemoTerminal(object):
     def feed_child(self, text):
         """
         gobject-introspection/python-gi differences force us to try with and
-        without the text length. One of them will work.
+        without the text length and str or number. One of them will work.
         """
         item = text.encode("utf8")
         try:
-            self.term.feed_child(item.decode())
+            self.term.feed_child(item)
         except TypeError:
-            self.term.feed_child(item.decode(), len(item))
+            try:
+                self.term.feed_child(item, len(item))
+            except TypeError:
+                try:
+                    self.term.feed_child(item.decode())
+                except TypeError:
+                    self.term.feed_child(item.decode(), len(item))
 
 class Crowbar(object):
     """Modify the Nemo' widget tree when the crowbar is inserted in it.
