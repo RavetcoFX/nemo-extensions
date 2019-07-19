@@ -409,6 +409,8 @@ class NemoTerminal(object):
         without the text length and str or number. One of them will work.
         """
         item = text.encode("utf8")
+        print("UTF8 Encoding: %s" % item + "\n")
+        print("Decoded: " + item.decode() + "\n")
         try:
             self.term.feed_child(item)
         except TypeError:
@@ -419,18 +421,6 @@ class NemoTerminal(object):
                     self.term.feed_child(item.decode())
                 except TypeError:
                     self.term.feed_child(item.decode(), len(item))
-        except OverflowError:
-            item = text.encode("utf16")
-            try:
-                self.term.feed_child(item)
-            except TypeError:
-                try:
-                    self.term.feed_child(item, len(item))
-                except TypeError:
-                    try:
-                        self.term.feed_child(item.decode())
-                    except TypeError:
-                        self.term.feed_child(item.decode(), len(item))
 
 class Crowbar(object):
     """Modify the Nemo' widget tree when the crowbar is inserted in it.
